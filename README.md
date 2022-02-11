@@ -132,7 +132,22 @@ Moreover, using destructuring with a dynamic import makes the intentions less cl
 
 ## Previous work
 
-- haskell
-- ocaml
+### Haskell
+Haskell has rich syntax for imports and qualified imports:
+
+```hs
+import qualified Data.List (sort, fold, map)
+
+Data.List.sort …
+Data.List.fold …
+Data.List.map …
+```
+
+- C#
+C# supports namespaces and exports of namespaces. Such namespaces can be imported later on like so:
+
+```cs
+using Sorter = Data.List.Sorter;
+```
 
 #todo: add links and compare
