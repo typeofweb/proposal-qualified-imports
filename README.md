@@ -125,7 +125,7 @@ Even though this might work for certain scenarios, it makes it more difficult to
 
 Moreover, there's an overhead related to parsing and gathering all of the exports in a single namespace – compared to just a few we might want to use.
 
-### You could use dynamic import with destructuring like `const { a, b } = await import('./module.js');
+### You could use dynamic import with destructuring like `const { a, b } = await import('./module.js');`
 Yes. However, there are a few major differences to what is drafted in this proposal. (#todo what are they?)
 
 Moreover, using destructuring with a dynamic import makes the intentions less clear.
