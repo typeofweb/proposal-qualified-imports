@@ -1,7 +1,7 @@
 {
   "private": true,
-  "name": "template-for-proposals",
-  "description": "A repository template for ECMAScript proposals.",
+  "name": "qualified-imports-proposal",
+  "description": "Qualified Imports ECMAScript proposal.",
   "scripts": {
     "start": "npm run build-loose -- --watch",
     "build": "npm run build-loose -- --strict",
@@ -14,6 +14,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "ecmarkup": "^8.1.0"
+    "ecmarkup": "^9.8.1"
   }
 }

@@ -1,60 +1,137 @@
-# template-for-proposals
+# Qualified Imports ECMAScript Proposal
 
-A repository template for ECMAScript proposals.
+**Author**: Michał Miszczyszyn (@mmiszy)
 
-## Before creating a proposal
+## Summary
 
-Please ensure the following:
-  1. You have read the [process document](https://tc39.github.io/process-document/)
-  1. You have reviewed the [existing proposals](https://github.com/tc39/proposals/)
-  1. You are aware that your proposal requires being a member of TC39, or locating a TC39 delegate to "champion" your proposal
+Introduce new syntax which allows for creating an object from imports:
 
-## Create your proposal repo
+```js
+import { a, b, fn } as Package from './package.js';
+```
 
-Follow these steps:
-  1.  Click the green ["use this template"](https://github.com/tc39/template-for-proposals/generate) button in the repo header. (Note: Do not fork this repo in GitHub's web interface, as that will later prevent transfer into the TC39 organization)
-  1.  Go to your repo settings “Options” page, under “GitHub Pages”, and set the source to the **main branch** under the root (and click Save, if it does not autosave this setting)
-      1. check "Enforce HTTPS"
-      1. On "Options", under "Features", Ensure "Issues" is checked, and disable "Wiki", and "Projects" (unless you intend to use Projects)
-      1. Under "Merge button", check "automatically delete head branches"
-<!--
-  1.  Avoid merge conflicts with build process output files by running:
-      ```sh
-      git config --local --add merge.output.driver true
-      git config --local --add merge.output.driver true
-      ```
-  1.  Add a post-rewrite git hook to auto-rebuild the output on every commit:
-      ```sh
-      cp hooks/post-rewrite .git/hooks/post-rewrite
-      chmod +x .git/hooks/post-rewrite
-      ```
--->
-  3.  ["How to write a good explainer"][explainer] explains how to make a good first impression.
+## Motivation
 
-      > Each TC39 proposal should have a `README.md` file which explains the purpose
-      > of the proposal and its shape at a high level.
-      >
-      > ...
-      >
-      > The rest of this page can be used as a template ...
+When using ECMAScript modules, it's often desired to import only certain named exports like so:
 
-      Your explainer can point readers to the `index.html` generated from `spec.emu`
-      via markdown like
+```js
+import { a, b, fn } from "./package.js";
+```
 
-      ```markdown
-      You can browse the [ecmarkup output](https://ACCOUNT.github.io/PROJECT/)
-      or browse the [source](https://github.com/ACCOUNT/PROJECT/blob/HEAD/spec.emu).
-      ```
+This is currently part of the ECMAScript specification and is widely supported. However, some problems arise when using multiple imports in the same file.
 
-      where *ACCOUNT* and *PROJECT* are the first two path elements in your project's Github URL.
-      For example, for github.com/**tc39**/**template-for-proposals**, *ACCOUNT* is "tc39"
-      and *PROJECT* is "template-for-proposals".
+### Vague names
 
+It's often the case that small utility functions with vague names are being exported from modules, and they only make sense when put in certain context. For instance:
 
-## Maintain your proposal repo
+```js
+import { fmap } from "./functor.js";
+```
 
-  1. Make your changes to `spec.emu` (ecmarkup uses HTML syntax, but is not HTML, so I strongly suggest not naming it ".html")
-  1. Any commit that makes meaningful changes to the spec, should run `npm run build` and commit the resulting output.
-  1. Whenever you update `ecmarkup`, run `npm run build` and commit any changes that come from that dependency.
+```js
+import { fmap } from "./applicative.js";
+```
 
-  [explainer]: https://github.com/tc39/how-we-work/blob/HEAD/explainer.md
+```js
+import { fmap } from "./monad.js";
+```
+
+Out of context, `fmap` could be either of those implementations.
+
+### Name conflicts
+
+Importing two (or more) named exports from different packages results in a conflict of declarations:
+
+```js
+import { a } from "./one.js";
+import { a } from "./two.js"; // Error!
+```
+
+This can be currently solved by renaming the imports:
+
+```js
+import { a as aOne } from "./one.js";
+import { a as aTwo } from "./two.js";
+```
+
+Yet, it quickly becomes cumbersome when we have multiple imports such as when using utilities libraries:
+
+```js
+import {
+  map as lodashMap,
+  reduce as lodashReduce,
+  find as lodashFind,
+  filter as lodashFilter,
+  // … etc.
+} from "./lodash.js";
+import {
+  map as bluebirdMap,
+  reduce as bluebirdReduce,
+  find as bluebirdFind,
+  filter as bluebirdFilter,
+  // … etc.
+} from "./bluebird.js";
+```
+
+## Proposed Solution
+
+Qualified Imports: a new syntax that allows importing multiple named exports and grouping them into a namespace. Compare:
+
+### Vague names solution
+
+```js
+import { fmap } as Functor from "./functor.js";
+
+Functor.fmap(/* … */);
+```
+
+```js
+import { fmap } as Applicative from "./applicative.js";
+
+Applicative.fmap(/* … */);
+```
+
+```js
+import { fmap } as Monad from "./monad.js";
+
+Monad.fmap(/* … */);
+```
+
+### Name conflicts solution
+
+```js
+import {
+  map,
+  reduce,
+  find,
+  filter,
+  // … etc.
+} as Lodash from "./lodash.js";
+import {
+  map,
+  reduce,
+  find,
+  filter,
+  // … etc.
+} as Bluebird from "./bluebird.js";
+
+Lodash.find(/* … */);
+Bluebird.map(/* … */);
+```
+
+## FAQ
+### Why not just use `import * as X from './x.js'` ?
+Even though this might work for certain scenarios, it makes it more difficult to reason about the modules being used. This is a problem not only for the developers due to the lack of readability, but also for the tooling which might not be able to correctly determine whether particular exports are actually used or not.
+
+Moreover, there's an overhead related to parsing and gathering all of the exports in a single namespace – compared to just a few we might want to use.
+
+### You could use dynamic import with destructuring like `const { a, b } = await import('./module.js');
+Yes. However, there are a few major differences to what is drafted in this proposal. (#todo what are they?)
+
+Moreover, using destructuring with a dynamic import makes the intentions less clear.
+
+## Previous work
+
+- haskell
+- ocaml
+#todo: add links and compare
