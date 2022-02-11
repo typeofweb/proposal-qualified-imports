@@ -143,7 +143,7 @@ Data.List.fold …
 Data.List.map …
 ```
 
-- C#
+### C#
 C# supports namespaces and exports of namespaces. Such namespaces can be imported later on like so:
 
 ```cs
