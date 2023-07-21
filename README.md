@@ -4,7 +4,7 @@
 
 ## Summary
 
-Introduce new syntax which allows for creating an object from imports:
+Introduce new syntax that allows for creating an object from imports:
 
 ```js
 import { a, b, fn } as Package from './package.js';
@@ -202,6 +202,6 @@ let _ = Log.(
 );
 ```
 
-##
+## Further reading
 
 - [Similar proposal for Swift](https://gist.github.com/CodaFi/42e5e5e94d857547abc381d9a9d0afd6)
