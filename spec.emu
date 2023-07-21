@@ -28,10 +28,8 @@ contributors: Michał Miszczyszyn
           ImportedDefaultBinding `,` NamedImports
           ImportedDefaultBinding `,` NamedImports <ins>QualifiedImportClause</ins>
 
-        <ins>
-          QualifiedImportClause :
-            `as` ImportedBinding
-        </ins>
+        <ins>QualifiedImportClause :
+            `as` ImportedBinding</ins>
       </emu-grammar>
 
       <emu-clause id="sec-static-semantics-importentriesformodule" type="sdo" number="3">
