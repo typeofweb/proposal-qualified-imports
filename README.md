@@ -22,7 +22,7 @@ This is currently part of the ECMAScript specification and is widely supported. 
 
 ### Vague names
 
-It's often the case that small utility functions with vague names are being exported from modules, and they only make sense when put in certain context. For instance:
+It's often the case that small utility functions with vague names are being exported from modules, and they only make sense when put in a certain context. For instance:
 
 ```js
 import { fmap } from "./functor.js";
@@ -54,7 +54,7 @@ import { a as aOne } from "./one.js";
 import { a as aTwo } from "./two.js";
 ```
 
-Yet, it quickly becomes cumbersome when we have multiple imports such as when using utilities libraries:
+Yet, it quickly becomes cumbersome when we have multiple imports such as when using utility libraries:
 
 ```js
 import {
@@ -121,14 +121,9 @@ Bluebird.map(/* … */);
 
 ## FAQ
 ### Why not just use `import * as X from './x.js'` ?
-Even though this might work for certain scenarios, it makes it more difficult to reason about the modules being used. This is a problem not only for the developers due to the lack of readability, but also for the tooling which might not be able to correctly determine whether particular exports are actually used or not.
+Even though this might work for certain scenarios, it makes it more difficult to reason about the modules being used. This is a problem not only for the developers due to the lack of readability but also for the tooling which might not be able to correctly determine whether particular exports are used or not.
 
 Moreover, there's an overhead related to parsing and gathering all of the exports in a single namespace – compared to just a few we might want to use.
-
-### You could use dynamic import with destructuring like `const { a, b } = await import('./module.js');`
-Yes. However, there are a few major differences to what is drafted in this proposal. (#todo what are they?)
-
-Moreover, using destructuring with a dynamic import makes the intentions less clear.
 
 ## Previous work
 
@@ -149,7 +144,8 @@ Alternatively, imports can be grouped and renamed:
 import qualified Data.Map.Lazy (lookup) as Map
 ```
 
-Quoting https://wiki.haskell.org/Import: Supposing that the module `Mod` exports four functions named `x`, `y`, `z`, and `(+++)`:
+
+> Supposing that the module `Mod` exports four functions named `x`, `y`, `z`, and `(+++)`:
 
 | Import command                      | What is brought into scope                       | Notes                                                                      |
 | ----------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------- |
@@ -165,6 +161,16 @@ Quoting https://wiki.haskell.org/Import: Supposing that the module `Mod` exports
 | `import qualified Mod as Foo`       | `Foo.x, Foo.y, Foo.z, (Foo.+++)`                 | (Only qualified names, using new qualifier.)                               |
 | `import qualified Mod as Foo (x,y)` | `Foo.x, Foo.y`                                   | (Only qualified versions of `x` and `y`, using new qualifier)              |
 
+source: https://wiki.haskell.org/Import
+
+### Purescript
+
+Modules in Purescript can be qualified and they allow for selective imports:
+
+```purescript
+import Data.List (sort, fold, map) as List
+```
+
 ### C#
 C# supports namespaces and exports of namespaces. Such namespaces can be imported later on like so:
 
@@ -172,4 +178,30 @@ C# supports namespaces and exports of namespaces. Such namespaces can be importe
 using Sorter = Data.List.Sorter;
 ```
 
-#todo: add links and compare
+### OCaml / ReasonML / ReScript
+
+OCaml et al. support local opens, which are somewhat similar to qualified imports because they allow for importing a module and using it locally without polluting the global scope. For instance:
+
+```ml
+(** OCaml *)
+let _ =
+  let open Log in
+	  make ()
+      |> (logStr ("Hello"))
+      |> (logStr ("everyone"))
+      |> print
+```
+
+```re
+// ReasonML / ReScript
+let _ = Log.(
+  make()
+    |> logStr("Hello")
+    |> logStr("everyone")
+    |> print
+);
+```
+
+##
+
+- [Similar proposal for Swift](https://gist.github.com/CodaFi/42e5e5e94d857547abc381d9a9d0afd6)
